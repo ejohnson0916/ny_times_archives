@@ -70,14 +70,18 @@ ny_times_df['index'] = range(1, len(ny_times_df) + 1)
 print(ny_times_df)
 
 
-database = 'eanj'
-username = 'eanj'
-password = 'Officespace8'
-host = 'eanj.cnsiydz9iplc.us-east-2.rds.amazonaws.com'
-port = '5432'
+
+database = ''
+username = ''
+password = ''
+host = ''
+port = ''
 
 try:
-    engine = sqlalchemy.create_engine('postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(username, password, host, port, database), echo=True)
+    engine = sqlalchemy.create_engine('postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(username, password, host, port, database),
+                                      echo=True,
+                                      connect_args={"check_same_thread": False},
+                                      poolclass=StaticPool)
     connection = engine.connect()
     print('Im entering the mainframe')
 
@@ -85,7 +89,7 @@ except:
     print("Your credentials are fucked up asshole")
 
 metadata = MetaData()
-nytimes = Table('nytimes', metadata,
+nytimes = Table('ny_times', metadata,
                 Column('headlines', String(255)),
                 Column('publish_date', Date()),
                 Column('type_material', String(255)),
@@ -94,4 +98,4 @@ nytimes = Table('nytimes', metadata,
 
 metadata.create_all(engine)
 
-ny_times_df.to_sql('spotify_table',con=connection, if_exists='replace')
+ny_times_df.to_sql('ny_times', con=connection, if_exists='replace')
